@@ -56,6 +56,21 @@ def show(node):
             show(e)
 
 
+def show_win32(node):
+    if not node.hasChildNodes():
+        if node.nodeType == node.TEXT_NODE and node.data != '\n':
+            tag_name = node.parentNode.tagName
+            content = node.data.replace('\n', '')
+            if tag_name in TAG_DICT.keys():
+                tag = TAG_DICT[tag_name]
+                try:
+                    print(tag.value.decode('ascii') % content)
+                except UnicodeEncodeError as e:
+                    pass
+    else:
+        for e in node.childNodes:
+            show_win32(e)
+
 def main():
     try:
         options, args = getopt.getopt(sys.argv[1:], ["help"])
@@ -68,7 +83,11 @@ def main():
     if not response:
         return
     root = read_xml(response)
-    show(root)
+
+    if not sys.platform == 'win32':
+        show(root)
+    else :
+        show_win32(root)
 
 
 if __name__ == '__main__':
