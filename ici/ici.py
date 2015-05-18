@@ -50,16 +50,20 @@ def show(node):
             content = node.data.replace('\n', '')
             if tag_name in TAG_DICT.keys():
                 tag = TAG_DICT[tag_name]
-                if not sys.platform == 'win32':
-                    print colored(tag.value % content, tag.color)
-                else:
-                    try:
-                        print(tag.value.decode('ascii') % content)
-                    except UnicodeEncodeError as e:
-                        pass
+                print_tag(tag, content)
     else:
         for e in node.childNodes:
             show(e)
+
+
+def print_tag(tag, content):
+    if not sys.platform == 'win32':
+        print colored(tag.value % content, tag.color)
+    else:
+        try:
+            print(tag.value.decode('ascii') % content)
+        except UnicodeEncodeError as e:
+            pass
 
 
 def main():
