@@ -50,26 +50,17 @@ def show(node):
             content = node.data.replace('\n', '')
             if tag_name in TAG_DICT.keys():
                 tag = TAG_DICT[tag_name]
-                print colored(tag.value % content, tag.color)
+                if not sys.platform == 'win32':
+                    print colored(tag.value % content, tag.color)
+                else:
+                    try:
+                        print(tag.value.decode('ascii') % content)
+                    except UnicodeEncodeError as e:
+                        pass
     else:
         for e in node.childNodes:
             show(e)
 
-
-def show_win32(node):
-    if not node.hasChildNodes():
-        if node.nodeType == node.TEXT_NODE and node.data != '\n':
-            tag_name = node.parentNode.tagName
-            content = node.data.replace('\n', '')
-            if tag_name in TAG_DICT.keys():
-                tag = TAG_DICT[tag_name]
-                try:
-                    print(tag.value.decode('ascii') % content)
-                except UnicodeEncodeError as e:
-                    pass
-    else:
-        for e in node.childNodes:
-            show_win32(e)
 
 def main():
     try:
@@ -83,11 +74,7 @@ def main():
     if not response:
         return
     root = read_xml(response)
-
-    if not sys.platform == 'win32':
-        show(root)
-    else :
-        show_win32(root)
+    show(root)
 
 
 if __name__ == '__main__':
