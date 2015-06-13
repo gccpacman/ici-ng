@@ -61,7 +61,7 @@ def print_tag(tag, content):
         print colored(tag.value % content, tag.color)
     else:
         try:
-            print(tag.value.decode('ascii') % content)
+            print(colored(tag.value % content), tag.color)
         except UnicodeEncodeError as e:
             pass
 
