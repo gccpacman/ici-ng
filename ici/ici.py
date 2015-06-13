@@ -10,8 +10,6 @@ import logging
 from xml.dom import minidom
 from collections import namedtuple
 
-from termcolor import colored
-
 
 KEY = 'E0F0D336AF47D3797C68372A869BDBC5'
 URL = 'http://dict-co.iciba.com/api/dictionary.php'
@@ -58,10 +56,11 @@ def show(node):
 
 def print_tag(tag, content):
     if not sys.platform == 'win32':
+        from termcolor import colored
         print colored(tag.value % content, tag.color)
     else:
         try:
-            print(colored(tag.value % content), tag.color)
+            print(tag.value.decode('ascii') % content)
         except UnicodeEncodeError as e:
             pass
 
