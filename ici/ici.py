@@ -13,14 +13,14 @@ from collections import namedtuple
 
 KEY = 'E0F0D336AF47D3797C68372A869BDBC5'
 URL = 'http://dict-co.iciba.com/api/dictionary.php'
-TAG = namedtuple('TAG', 'value color')
+TAG = namedtuple('TAG', ['value', 'color', 'newline'], verbose=False, rename=False)
 TAG_DICT = {
-    'ps': TAG('[%s]', 'green'),
-    'fy': TAG('%s', 'green'),
-    'orig': TAG('ex. %s', 'blue'),
-    'trans': TAG('    %s', 'cyan'),
-    'pos': TAG('%s'.ljust(12), 'green'),
-    'acceptation': TAG('%s', 'yellow')
+    'ps': TAG('[%s]', 'green', False),
+    'fy': TAG('%s', 'green', False),
+    'orig': TAG('%s', 'red', False),
+    'trans': TAG('%s', 'white', True),
+    'pos': TAG('%s'.ljust(12), 'red', False),
+    'acceptation': TAG('%s', 'white', True)
 }
 
 
@@ -40,24 +40,34 @@ def read_xml(xml):
     dom = minidom.parse(xml)
     return dom.documentElement
 
+from termcolor import colored
+
+ex_count = 0
 
 def show(node):
+    global ex_count
     if not node.hasChildNodes():
         if node.nodeType == node.TEXT_NODE and node.data != '\n':
             tag_name = node.parentNode.tagName
             content = node.data.replace('\n', '')
             if tag_name in TAG_DICT.keys():
                 tag = TAG_DICT[tag_name]
-                print_tag(tag, content)
+                if tag_name == 'orig':
+                    ex_count = ex_count+1
+                    print colored(str(ex_count)+'. ', 'yellow'),
+                    print_tag(tag, content)
+                else:
+                    print_tag(tag, content)
     else:
         for e in node.childNodes:
             show(e)
 
-
 def print_tag(tag, content):
     if not sys.platform == 'win32':
-        from termcolor import colored
-        print colored(tag.value % content, tag.color)
+        if tag.newline:
+            print colored(tag.value % content, tag.color)
+        else:
+            print colored(tag.value % content, tag.color) ,
     else:
         try:
             print(tag.value.decode('ascii') % content)
